@@ -1,0 +1,39 @@
+@import url("normalize.css");
+
+:root {
+    --transition-duration: 1s;
+}
+
+body {
+    font-size: var(--base-font-size);
+}
+
+h2 {
+    font-size: 4rem;
+    margin: 1rem 0rem;
+}
+
+#world {
+    top: 0;
+    left: 0;
+    position: absolute;
+    transform-origin: top left;
+    transition: transform var(--transition-duration) ease-in-out;
+}
+
+#view {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.slip {
+    padding: 1rem 2rem;
+}
+
+.equation {
+    display: flex;
+    justify-content: center;
+}
