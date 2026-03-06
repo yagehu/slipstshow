@@ -1,4 +1,4 @@
-#let font-size = 18pt
+#let font-size = 24pt
 
 #let _counter = counter("slipstshow")
 
@@ -9,7 +9,6 @@
 }
 
 #let up(label, offset: 0) = metadata((slipstshow-action: (up: label, offset: offset)))
-
 
 #let _should_strip(it) = {
   (
@@ -40,9 +39,8 @@
           attrs: (class: "slip", data-slip: str(_counter.get().first())),
           currSlip
         )
+        currSlip = []
       }
-
-      currSlip = []
     } else if x.func() == metadata and x.value == "slipstshow-pause" {
       _counter.step()
 

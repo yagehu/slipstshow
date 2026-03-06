@@ -6,6 +6,21 @@ effect(() => {
   history.replaceState(null, "", `#${ currentSlipIdx.value }`);
 });
 
+effect(() => {
+    document.querySelectorAll(".slip").forEach(slip => {
+        const attr = slip.getAttribute("data-slip");
+        const slipIdx = attr !== null ? parseInt(attr, 10) : 0;
+
+        if (slip instanceof HTMLElement) {
+            if (slipIdx <= currentSlipIdx.value) {
+                slip.style.opacity = "1";
+            } else {
+                slip.style.opacity = "0";
+            }
+        }
+    });
+})
+
 const maxSlip = Array.from(document.querySelectorAll(".slip"))
   .map((slip) => {
     const attr = slip.getAttribute("data-slip");

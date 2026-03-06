@@ -4,21 +4,35 @@
 
 = Presentation
 
-#lorem(50):
+#pause
+
+#lorem(50)
+
+#pause
+
+- #lorem(10)
+- #lorem(10)
+- #lorem(10)
+
 #pause
 
 #lorem(120)
 
-#lorem(100)
 #pause
 
+#lorem(150)
+
+#pause
+
+$ sum_(k=1)^n k = (n(n+1)) / 2 $
+
+#pause
 
 #lorem(120)
 
 #pause
 
 #slips(
-  anchor: <slips>,
   subslip[
     == The Research Problem
 
@@ -38,6 +52,7 @@
   ],
   subslip[
     #pause
+
     #lorem(60)
   ],
 )

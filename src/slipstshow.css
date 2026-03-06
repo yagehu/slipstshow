@@ -6,6 +6,7 @@
 
 body {
     font-size: var(--base-font-size);
+    caret-color: transparent;
 }
 
 h2 {
@@ -31,6 +32,7 @@ h2 {
 
 .slip {
     padding: 1rem 2rem;
+    transition: opacity var(--transition-duration) ease-in-out;
 }
 
 .equation {
