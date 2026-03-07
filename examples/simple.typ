@@ -34,9 +34,16 @@ $ sum_(k=1)^n k = (n(n+1)) / 2 $
 
 #slips(
   subslip[
-    == The Research Problem
+    #pause
+
+    == The Research Problem <0>
+
+    #up(<0>)
+    #pause
 
     #lorem(20)
+
+    #up(<0>)
 
     An inline equation: $E = m c^2$.
 
@@ -56,3 +63,9 @@ $ sum_(k=1)^n k = (n(n+1)) / 2 $
     #lorem(60)
   ],
 )
+
+#pause
+
+#lorem(100)
+
+#pause

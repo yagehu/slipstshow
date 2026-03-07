@@ -1,6 +1,7 @@
 #let font-size = 24pt
 
 #let _counter = counter("slipstshow")
+#let _label_map = state("slipstshow-labels", (:))
 
 #let pause = if dictionary(std).at("html", default: none) == none {
   parbreak()
@@ -28,30 +29,60 @@
   slip
 }
 
-#let _fuse(xs) = context {
+#let _fuse(xs) = {
   let currSlip = []
 
   for x in xs {
     if x.func() == parbreak {
-      if currSlip != [] {
-        context html.elem(
-          "div",
-          attrs: (class: "slip", data-slip: str(_counter.get().first())),
-          currSlip
-        )
-        currSlip = []
-      }
+      // if currSlip != [] {
+      //   context html.elem(
+      //     "div",
+      //     attrs: (class: "slip", data-slip: str(_counter.get().first())),
+      //     currSlip
+      //   )
+      //   currSlip = []
+      // }
+    } else if x.func() == [ ].func() {
     } else if x.func() == metadata and x.value == "slipstshow-pause" {
-      _counter.step()
-
       if currSlip != [] {
-        context html.elem(
-          "div",
-          attrs: (class: "slip", data-slip: str(_counter.get().first())),
-          currSlip
-        )
+        _fuse(currSlip.children)
       }
 
+      context _counter.step()
+      currSlip = []
+    } else if x.has("label") {
+      let key = str(x.label)
+      let cnt = _counter.get().first()
+
+      _label_map.update(d => { d.insert(key, cnt); d })
+
+      context html.elem(
+        "div",
+        attrs: (
+          class: "slip",
+          data-slip: str(cnt),
+        ),
+        currSlip + x,
+      )
+
+      currSlip = []
+    } else if x.func() == metadata and "slipstshow-action" in x.value {
+      let anchor_key = str(x.value.slipstshow-action.up)
+      let offset = x.value.slipstshow-action.at("offset", default: 0)
+
+      context html.elem(
+        "div",
+        attrs: (
+          class: "slip",
+          data-slip: str(_counter.get().first()),
+          data-slip-up: str(
+            _label_map.get().at(anchor_key, default: 0) + offset
+          )
+        ),
+        currSlip
+      )
+
+      _counter.step()
       currSlip = []
     } else if x.func() == math.equation {
       if x.block {
@@ -167,6 +198,8 @@
           .join()
       }
     )
+  } else {
+    subslips.join()
   }
 }
 
@@ -174,7 +207,7 @@
   _counter.update(0)
 
   if target() == "html" {
-    show math.equation: it => context {
+    show math.equation: it => {
       html.frame(it)
     }
     show math.equation.where(block: false): box

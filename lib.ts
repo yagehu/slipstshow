@@ -78,8 +78,10 @@ function worldRect(el) {
 effect(() => {
     const view = document.querySelector("#view");
     const world = document.querySelector("#world");
-    const slips = document.querySelectorAll(`[data-slip="${ currentSlipIdx.value }"]`);
+    const slips = document
+        .querySelectorAll(`[data-slip="${ currentSlipIdx.value }"]`);
     const slip = slips[slips.length - 1];
+    const up = slip.getAttribute("data-slip-up");
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -87,10 +89,24 @@ effect(() => {
 
     const scale = vw / r.w;
 
-    const dx = vw / 2 - (r.x + r.w / 2) * scale;
-    const dy = vh - (r.y + r.h) * scale;
+    console.log(up);
 
-    if (r.y + r.h > window.innerHeight) {
+    if (up !== null) {
+        const slips = document.querySelectorAll(`[data-slip="${ up }"]`);
+        const slip = slips[0];
+        const r = worldRect(slip);
+        const scale = vw / r.w;
+        const dx = vw / 2 - (r.x + r.w / 2) * scale;
+        const dy = -r.y * scale;
+
+        world.style.transform = `
+            translate(${ dx }px, ${ dy }px)
+            scale(${ scale })
+        `;
+    } else  if (r.y + r.h > window.innerHeight) {
+        const dx = vw / 2 - (r.x + r.w / 2) * scale;
+        const dy = vh - (r.y + r.h) * scale;
+
         world.style.transform = `
             translate(${ dx }px, ${ dy }px)
             scale(${ scale })
