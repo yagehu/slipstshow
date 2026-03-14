@@ -1,0 +1,11 @@
+[package]
+name = "slipstshow"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Yage Hu <yagejhu@gmail.com>"]
+license = "GPL-3.0-or-later"
+keywords = ["presentation", "slide", "slides", "slipshow"]
+categories = ["presentation"]
+description = "A port of the OCaml presentation tool Slipshow."
+exclude = ["examples"]
+compiler = "0.14.0"

@@ -1,49 +1,45 @@
-#import "../src/lib.typ": *
+#import "@preview/slipstshow:0.1.0": *
 
 #show: slipstshow.with()
 
 = Presentation
 
-#pause
+#pause()
 
 #lorem(50)
 
-#pause
+#pause()
 
 - #lorem(10)
 - #lorem(10)
 - #lorem(10)
 
-#pause
+#pause()
 
 #lorem(120)
 
-#pause
+#pause()
 
 #lorem(150)
 
-#pause
+#pause()
 
 $ sum_(k=1)^n k = (n(n+1)) / 2 $
 
-#pause
+#pause()
 
 #lorem(120)
 
-#pause
+#pause()
 
 #slips(
   subslip[
-    #pause
 
     == The Research Problem <0>
 
-    #up(<0>)
-    #pause
+    #pause(up: <0>)
 
     #lorem(20)
-
-    #up(<0>)
 
     An inline equation: $E = m c^2$.
 
@@ -53,19 +49,22 @@ $ sum_(k=1)^n k = (n(n+1)) / 2 $
       E = m c^2
     $
 
-    #pause
+    #pause()
 
     #lorem(100)
+
+    #pause()
   ],
   subslip[
-    #pause
-
+    #metadata("dummy") <1>
     #lorem(60)
+    #pause(up: <1>)
   ],
 )
+#step
 
-#pause
+haha #lorem(101)
 
-#lorem(100)
+#pause()
 
-#pause
+#lorem(200)

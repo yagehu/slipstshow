@@ -3,13 +3,25 @@
 #let _counter = counter("slipstshow")
 #let _label_map = state("slipstshow-labels", (:))
 
-#let pause = if dictionary(std).at("html", default: none) == none {
+#let pause(up: none) = if dictionary(std).at("html", default: none) == none {
   parbreak()
 } else {
-  metadata("slipstshow-pause")
+  metadata((
+    type: "slipstshow-pause",
+    value: (
+      up: up,
+    ),
+  ))
 }
 
-#let up(label, offset: 0) = metadata((slipstshow-action: (up: label, offset: offset)))
+#let step = if dictionary(std).at("html", default: none) == none {
+  parbreak()
+} else {
+  metadata((
+    type: "slipstshow-step",
+    value: none,
+  ))
+}
 
 #let _should_strip(it) = {
   (
@@ -29,74 +41,64 @@
   slip
 }
 
-#let _fuse(xs) = {
-  let currSlip = []
+#let _curr_slip = state("curr-slip", [])
 
+#let _fuse(xs, attrs: (:)) = context {
   for x in xs {
-    if x.func() == parbreak {
-      // if currSlip != [] {
-      //   context html.elem(
-      //     "div",
-      //     attrs: (class: "slip", data-slip: str(_counter.get().first())),
-      //     currSlip
-      //   )
-      //   currSlip = []
-      // }
+    context if x.func() == parbreak {
+      _curr_slip.update(d => d + x)
     } else if x.func() == [ ].func() {
-    } else if x.func() == metadata and x.value == "slipstshow-pause" {
-      if currSlip != [] {
-        _fuse(currSlip.children)
+      _curr_slip.update(d => d + x)
+    } else if (
+      x.func() == metadata
+        and type(x.value) == dictionary
+        and "type" in x.value
+        and x.value.type == "slipstshow-step"
+    ) {
+      let c = _curr_slip.get()
+
+      html.elem(
+        "div",
+        attrs: (class: "slip", data-slip: str(_counter.get().first())),
+        c,
+      )
+      _curr_slip.update(d => [])
+    } else if (
+      x.func() == metadata
+        and type(x.value) == dictionary
+        and "type" in x.value
+        and x.value.type == "slipstshow-pause"
+    ) {
+      let data-slip-up = if x.value.value.up == none { (:) } else {
+        let anchor_key = str(x.value.value.up)
+        let up-idx = _label_map.get().at(anchor_key, default: -1)
+
+        (data-slip-up: str(up-idx))
       }
+      let c = _curr_slip.get()
 
-      context _counter.step()
-      currSlip = []
-    } else if x.has("label") {
-      let key = str(x.label)
-      let cnt = _counter.get().first()
-
-      _label_map.update(d => { d.insert(key, cnt); d })
-
-      context html.elem(
+      html.elem(
         "div",
-        attrs: (
-          class: "slip",
-          data-slip: str(cnt),
-        ),
-        currSlip + x,
+        attrs: (class: "slip", data-slip: str(_counter.get().first())) + data-slip-up,
+        c,
       )
-
-      currSlip = []
-    } else if x.func() == metadata and "slipstshow-action" in x.value {
-      let anchor_key = str(x.value.slipstshow-action.up)
-      let offset = x.value.slipstshow-action.at("offset", default: 0)
-
-      context html.elem(
-        "div",
-        attrs: (
-          class: "slip",
-          data-slip: str(_counter.get().first()),
-          data-slip-up: str(
-            _label_map.get().at(anchor_key, default: 0) + offset
-          )
-        ),
-        currSlip
-      )
-
+      _curr_slip.update(d => [])
       _counter.step()
-      currSlip = []
     } else if x.func() == math.equation {
       if x.block {
-        if currSlip != [] {
-          context html.elem(
+        let c = _curr_slip.get()
+
+        _curr_slip.update(d => [])
+
+        if c != [] {
+          html.elem(
             "div",
             attrs: (class: "slip", data-slip: str(_counter.get().first())),
-            currSlip
+            c,
           )
-
-          currSlip = []
         }
 
-        context html.elem(
+        html.elem(
           "div",
           attrs: (
             class: "slip equation",
@@ -106,18 +108,37 @@
         )
       } else {
         // Not a block equation.
-        currSlip += x
+        _curr_slip.update(d => d + x)
       }
     } else {
-      currSlip += x
+      _curr_slip.update(d => d + x)
+    }
+
+    if x.has("label") {
+      let key = str(x.label)
+      let cnt = _counter.get().first()
+
+      _label_map.update(d => { d.insert(key, cnt); d })
     }
   }
 
-  if currSlip != [] {
-    context html.elem(
+  context if (
+    (
+      _curr_slip.get().has("children")
+        and not _curr_slip.get().at("children").all(_should_strip)
+    )
+      or (
+        not _curr_slip.get().has("children")
+          and _curr_slip.get() != []
+          and not _should_strip(_curr_slip.get())
+      )
+  ) {
+    let c = _curr_slip.get()
+
+    html.elem(
       "div",
-      attrs: (class: "slip", data-slip: str(_counter.get().first())),
-      currSlip
+      attrs: (class: "slip", data-slip: str(_counter.get().first())) + attrs,
+      _curr_slip.get(),
     )
   }
 }
@@ -166,6 +187,8 @@
     data-scale: str(fr),
   )
 
+  _curr_slip.update(d => [])
+
   html.elem(
     "div",
     attrs: attrs,
@@ -182,21 +205,17 @@
   let frSum = columns.fold(0fr, (acc, fr) => acc + fr)
 
   if target() == "html" {
-    html.div(
-      style: "
-        display: flex;
-      ",
-      {
-        subslips
-          .pos()
-          .zip(columns)
-          .map(pair => {
-            let (fn, fr) = pair
+    _curr_slip.update(d => [])
+    _fuse(
+      subslips
+        .pos()
+        .zip(columns)
+        .map(pair => {
+          let (fn, fr) = pair
 
-            fn(fr / frSum)
-          })
-          .join()
-      }
+          fn(fr / frSum)
+        }),
+      attrs: (style: "display: flex;"),
     )
   } else {
     subslips.join()

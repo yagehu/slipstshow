@@ -54,6 +54,7 @@ document.addEventListener("keydown", (event) => {
 // the unscaled layout.
 function worldRect(el) {
   const prev = world.style.transform;
+
   world.style.transition = 'none';
   world.style.transform  = 'matrix(1,0,0,1,0,0)';
   world.getBoundingClientRect(); // force reflow
@@ -82,36 +83,58 @@ effect(() => {
         .querySelectorAll(`[data-slip="${ currentSlipIdx.value }"]`);
     const slip = slips[slips.length - 1];
     const up = slip.getAttribute("data-slip-up");
-
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const r  = worldRect(slip);
-
+    const r = worldRect(slip);
+    const vr = worldRect(view);
     const scale = vw / r.w;
 
-    console.log(up);
-
     if (up !== null) {
-        const slips = document.querySelectorAll(`[data-slip="${ up }"]`);
-        const slip = slips[0];
-        const r = worldRect(slip);
-        const scale = vw / r.w;
+        const upSlips = document.querySelectorAll(`[data-slip="${ up }"]`);
+        const upSlip = upSlips[upSlips.length - 1];
+        const upR = worldRect(upSlip);
         const dx = vw / 2 - (r.x + r.w / 2) * scale;
-        const dy = -r.y * scale;
+        const dy = - (upR.y) * scale;
 
+        world.dataset.transformTranslateX = dx;
+        world.dataset.transformTranslateY = dy;
+        world.dataset.transformScale = scale;
         world.style.transform = `
             translate(${ dx }px, ${ dy }px)
             scale(${ scale })
         `;
-    } else  if (r.y + r.h > window.innerHeight) {
+    } else if (
+        r.y < (- world.dataset.transformTranslateY) / world.dataset.transformScale
+            || r.y + r.h > (- world.dataset.transformTranslateY + vh) / world.dataset.transformScale
+    ) {
         const dx = vw / 2 - (r.x + r.w / 2) * scale;
         const dy = vh - (r.y + r.h) * scale;
 
+        world.dataset.transformTranslateX = dx;
+        world.dataset.transformTranslateY = dy;
+        world.dataset.transformScale = scale;
+        world.style.transform = `
+            translate(${ dx }px, ${ dy }px)
+            scale(${ scale })
+        `;
+    } else if (
+        r.x < (- world.dataset.transformTranslateX) / world.dataset.transformScale
+            || r.x + r.w > (- world.dataset.transformTranslateX + vw) / world.dataset.transformScale
+    ) {
+        const dx = vw / 2 - (r.x + r.w / 2) * scale;
+        const dy = world.dataset.transformTranslateY;
+
+        world.dataset.transformTranslateX = dx;
+        world.dataset.transformTranslateY = dy;
+        world.dataset.transformScale = scale;
         world.style.transform = `
             translate(${ dx }px, ${ dy }px)
             scale(${ scale })
         `;
     } else if (currentSlipIdx.value === 0) {
+      world.dataset.transformTranslateX = 0;
+      world.dataset.transformTranslateY = 0;
+      world.dataset.transformScale = 1;
       world.style.transform = `
           translate3d(0px, 0px, 0px)
           scale(1)

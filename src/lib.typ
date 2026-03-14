@@ -1,1 +1,1 @@
-#import "slipstshow.typ": pause, slipstshow, up, slips, subslip
+#import "slipstshow.typ": pause, slipstshow, slips, step, subslip
