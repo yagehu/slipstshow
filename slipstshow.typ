@@ -144,13 +144,17 @@
     data-scale: str(fr),
   )
 
-  html.elem(
-    "div",
-    attrs: attrs,
-    {
-      _fuse([], body.children)
-    }
-  )
+  if target() == "html" {
+    html.elem(
+      "div",
+      attrs: attrs,
+      {
+        _fuse([], body.children)
+      }
+    )
+  } else {
+    body
+  }
 }
 
 #let slips(columns: auto, ..subslips) = context {
@@ -173,7 +177,7 @@
       attrs: (style: "display: flex;"),
     )
   } else {
-    subslips.join()
+    subslips.pos().map(fn => fn(1)).join()
   }
 }
 
