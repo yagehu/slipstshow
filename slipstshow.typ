@@ -235,13 +235,13 @@
       html.meta(charset: "utf-8")
       html.meta(name: "viewport", content: "width=device-width, initial-scale=1")
       html.head({
-        html.style(read("../build/slipstshow.css"))
+        html.style(read("slipstshow.css"))
         html.style("
           :root {
             --base-font-size: " + str(font-size.to-absolute().pt()) + "pt;
           }
         ")
-        html.script(read("../build/slipstshow.js"), type: "module")
+        html.script(read("slipstshow.js"), type: "module")
       })
 
       html.body(html.main(

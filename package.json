@@ -6,7 +6,6 @@
   "private": true,
   "module": "lib.ts",
   "scripts": {
-    "build": "esbuild lib.ts --bundle --outfile=build/slipstshow.js && esbuild src/slipstshow.css --bundle --outdir=build"
   },
   "dependencies": {
     "@preact/signals-core": "^1.13.0",

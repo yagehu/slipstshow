@@ -6,6 +6,8 @@
 
 #pause()
 
+#lorem(20)
+
 #lorem(50)
 
 #pause()
@@ -61,6 +63,7 @@ $ sum_(k=1)^n k = (n(n+1)) / 2 $
     #pause(up: <1>)
   ],
 )
+
 #step
 
 haha #lorem(101)
