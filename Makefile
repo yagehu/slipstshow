@@ -1,10 +1,35 @@
 build_dir ?= build
 
-ifndef XDG_DATA_HOME
-  XDG_DATA_HOME := ${HOME}/.local/share
+ifeq ($(OS),Windows_NT)
+  os := windows
+else
+  uname_s := $(shell uname -s)
+
+  ifeq ($(uname_s),Linux)
+    os := linux
+  endif
+
+  ifeq ($(uname_s),Darwin)
+    os := darwin
+  endif
 endif
 
-prefix ?= ${XDG_DATA_HOME}/typst/packages/preview/slipstshow/0.1.0
+install := install
+
+ifeq ($(os),linux)
+  ifndef XDG_DATA_HOME
+    data_dir := ${XDG_DATA_HOME}
+  else
+    data_dir := ${HOME}/.local/share
+  endif
+endif
+
+ifeq ($(os),darwin)
+  data_dir := ${HOME}/Library/Application Support
+  install := ginstall
+endif
+
+prefix ?= ${data_dir}/typst/packages/preview/slipstshow/0.1.0
 
 root = $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 typst_srcs := \
@@ -28,7 +53,7 @@ install: $(targets)
 	for file in $(targets); do \
 	  target="$(prefix)$$(sed 's/^$(build_dir)//' <<< $${file})"; \
 	  echo $${target}; \
-	  install -D $${file} $${target}; \
+	  $(install) -D "$${file}" "$${target}"; \
 	done
 
 $(build_dir)/slipstshow.js: lib.ts

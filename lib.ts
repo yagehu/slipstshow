@@ -131,13 +131,27 @@ effect(() => {
             translate(${ dx }px, ${ dy }px)
             scale(${ scale })
         `;
-    } else if (currentSlipIdx.value === 0) {
-      world.dataset.transformTranslateX = 0;
-      world.dataset.transformTranslateY = 0;
-      world.dataset.transformScale = 1;
-      world.style.transform = `
-          translate3d(0px, 0px, 0px)
-          scale(1)
-      `;
+    } else if (scale !== (world.dataset.transformScale || 1)) {
+        const dx = world.dataset.transformTranslateX;
+        const dy = world.dataset.transformTranslateY;
+
+        world.dataset.transformTranslateX = dx;
+        world.dataset.transformTranslateY = dy;
+        world.dataset.transformScale = scale;
+        world.style.transform = `
+            translate(${ dx }px, ${ dy }px)
+            scale(${ scale })
+        `;
+    }
+
+    if (currentSlipIdx.value === 0) {
+        console.log("reset", scale);
+        world.dataset.transformTranslateX = 0;
+        world.dataset.transformTranslateY = 0;
+        world.dataset.transformScale = scale;
+        world.style.transform = `
+            translate(0px, 0px)
+            scale(${ scale })
+        `;
     }
 });
