@@ -1,5 +1,3 @@
-#let font-size = 24pt
-
 #let _counter = counter("slipstshow")
 #let _label_map = state("slipstshow-labels", (:))
 
@@ -83,7 +81,7 @@
       _counter.step()
     } else if x.func() == math.equation {
       if x.block {
-        if c != [] {
+        if slip != [] {
           html.elem(
             "div",
             attrs: (class: "slip", data-slip: str(_counter.get().first())),
@@ -91,7 +89,7 @@
           )
         }
 
-        slip.last = []
+        slip = []
         html.elem(
           "div",
           attrs: (
@@ -181,7 +179,7 @@
   }
 }
 
-#let slipstshow(body) = context {
+#let slipstshow(base-font-size: 24pt, body) = context {
   _counter.update(0)
 
   if target() == "html" {
@@ -197,7 +195,7 @@
         html.style(read("slipstshow.css"))
         html.style("
           :root {
-            --base-font-size: " + str(font-size.to-absolute().pt()) + "pt;
+            --base-font-size: " + str(base-font-size.to-absolute().pt()) + "pt;
           }
         ")
         html.script(read("slipstshow.js"), type: "module")
@@ -221,7 +219,7 @@
     set page(
       paper: "presentation-16-9",
     )
-    set text(size: font-size)
+    set text(size: base-font-size)
 
     body
   }
